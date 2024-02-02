@@ -1,0 +1,83 @@
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+// ... (other classes and imports remain the same)
+
+class PayRollSystem {
+    // ... (unchanged code)
+
+    // Update this method to connect to the database and fetch employee data
+    public List<Employee> displayEmployees() {
+        List<Employee> employees = new ArrayList<>();
+
+        // JDBC URL, username, and password of MySQL server
+        String url = "jdbc:mysql://localhost:3306/your_database_name";
+        String user = "your_username";
+        String password = "your_password";
+
+        try (Connection connection = DriverManager.getConnection(url, user, password)) {
+            // Create a statement
+            Statement statement = connection.createStatement();
+
+            // Execute a query and get the result set
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM employees");
+
+            // Iterate through the result set and create Employee objects
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                int id = resultSet.getInt("id");
+                double salary = resultSet.getDouble("salary");
+
+                // Assuming there is a FullTimeEmployee class
+                FullTimeEmployee fullTimeEmployee = new FullTimeEmployee(name, id, salary);
+                employees.add(fullTimeEmployee);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return employees;
+    }
+}
+
+public class App1 {
+    // ... (unchanged code)
+
+    public void submitEmpDetails(boolean isFullTime) {
+        String name = nameField.getText();
+        int id = Integer.parseInt(idField.getText());
+
+        if (isFullTime) {
+            double salary = Double.parseDouble(salaryField.getText());
+
+            // Insert data into the database
+            insertFullTimeEmployee(name, id, salary);
+        } else {
+            // ... (handle PartTimeEmployee similarly)
+        }
+
+        System.out.println("Employee added successfully");
+    }
+
+    // Insert FullTimeEmployee data into the database
+    private void insertFullTimeEmployee(String name, int id, double salary) {
+        String url = "jdbc:mysql://localhost:3306/your_database_name";
+        String user = "your_username";
+        String password = "your_password";
+
+        try (Connection connection = DriverManager.getConnection(url, user, password)) {
+            String query = "INSERT INTO employees (name, id, salary) VALUES (?, ?, ?)";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, name);
+                preparedStatement.setInt(2, id);
+                preparedStatement.setDouble(3, salary);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ... (unchanged code)
+}
